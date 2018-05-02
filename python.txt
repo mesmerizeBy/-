@@ -1,0 +1,82 @@
+#!/usr/bin/python
+# -*- coding: UTF-8 -*-
+from Tkinter import *  
+import  ttk
+import urllib
+import urllib2
+import re
+
+def search(name,o):
+	headers = {'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:23.0) Gecko/20100101 Firefox/23.0'}
+	for i in range(len(name)):
+		values={}
+		id=re.findall(r"(.+?)=", name[i])[0]
+		na=re.findall(r"=(.+?)", name[i])[0]
+		na=na.decode('unicode-escape').encode()
+		values['user'] = id
+		data = urllib.urlencode(values) 
+		req = urllib2.Request(url="http://acm.hdu.edu.cn/userstatus.php?"+data, headers=headers)
+		response = urllib2.urlopen(req)
+		s= response.read()
+		print na
+		str=[]
+		str.append(id)
+		str.append(na)
+		str.append(re.findall(r"<td>Rank</td><td align=center>(.+?)</td></tr>",s)[0])
+		str.append(re.findall(r"<td>Problems Submitted</td><td align=center>(.+?)</td></tr>",s)[0])
+		str.append(re.findall(r"<td>Problems Solved</td><td align=center>(.+?)</td></tr>", s)[0])
+		str.append(re.findall(r"<td>Submissions</td><td align=center>(.+?)</td></tr>", s)[0])
+		str.append(re.findall(r"<td>Accepted</td><td align=center>(.+?)</td></tr>", s)[0])
+		o.insert('',i, values=str)
+
+
+def ui_process():
+	root = Tk()                     
+	root.geometry("800x600+500+200")
+	root.resizable(False, False)
+	w = Label(root,text="HDU-ACM数据统计")
+	w.config(font='Helvetica -15 bold',fg='white',width = 600,height = 3,bg = 'purple',anchor="w",justify=LEFT)
+	w.pack(side=TOP)
+
+	name=["wangtao971115=王涛","Awdriv=夏宇超","2275692457=邹绍栋","azznaz=周宁","wmj666=王明骏","CAY999=于睿诚","qq1047812974=艾伟华","jxnumowunian=邱英昌","jxnu17yc=袁程"]
+	scrollBar = Scrollbar(root)
+	scrollBar.pack(side=RIGHT, fill=Y)
+	print name[0].decode('unicode-escape').encode('UTF-8')
+	#Treeview×é¼þ£¬6ÁÐ£¬ÏÔÊ¾±íÍ·£¬´ø´¹Ö±¹ö¶¯Ìõ
+
+	tree = ttk.Treeview(root,columns=('c1', 'c2', 'c3', 'c4', 'c5', 'c6','c7'), show="headings",yscrollcommand=scrollBar.set)
+	tree.column('c1', width=70, anchor='center')
+	tree.column('c2', width=40, anchor='center')
+	tree.column('c3', width=40, anchor='center')
+	tree.column('c4', width=130, anchor='center')
+	tree.column('c5', width=100, anchor='center')
+	tree.column('c6', width=90, anchor='center')
+	tree.column('c7', width=90, anchor='center')
+
+	#ÉèÖÃÃ¿ÁÐ±íÍ·±êÌâÎÄ±¾
+	tree.heading('c1', text='id')
+	tree.heading('c2', text='姓名')
+	tree.heading('c3', text='Rank')
+	tree.heading('c4', text='Problems Submitted')
+	tree.heading('c5', text='Problems Solved')
+	tree.heading('c6', text='Submissions')
+	tree.heading('c7', text='Accepted')
+	tree.pack( fill=X)
+
+	# t = Listbox(root)
+	# bar = Scrollbar(root)
+	# bar.config(command=t.yview)
+	# t.config(yscrollcommand=bar.set,width=20,height=20,background='#ffffff')
+
+
+	
+	#2¸ö×é¼þ·Ö±ð´ò°ü
+	# bar.pack(side=RIGHT,fill=Y)
+	search(name,tree)
+	# t.pack(side=LEFT,fill=BOTH,expand=1) 
+	
+	root.update_idletasks()
+	root.mainloop()                 
+	
+if __name__ == "__main__":
+    ui_process()
